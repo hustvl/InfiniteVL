@@ -24,7 +24,7 @@ Haoran Yin<sup>2</sup>,
 
 
 <br>
-<a href="https://arxiv.org/abs/2502.xxxxx"><img src="https://img.shields.io/badge/arXiv-Paper-b31b1b.svg" alt="arXiv"></a>
+<a href="https://arxiv.org/abs/2512.08829"><img src="https://img.shields.io/badge/arXiv-Paper-b31b1b.svg" alt="arXiv"></a>
 <a href="https://huggingface.co/hustvl/InfiniteVL/"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Models-blue" alt="Hugging Face"></a>
 
 </div>
