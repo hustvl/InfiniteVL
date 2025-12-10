@@ -47,8 +47,8 @@ By synergizing **Sliding Window Attention (SWA)** for fine-grained local percept
 *   🏆 **Strong Performance:** Matches leading Transformer-based VLMs (e.g., Qwen2.5-VL-3B) and significantly outperforms previous linear VLMs (e.g., VL-Mamba, Cobra) on comprehensive aspects.
 
 ## News
-*   `Dec. 9th, 2025`: We release the **InfiniteVL** model weights and inference code! Please check [Model Zoo](#model-zoo).
-*   `Dec. 9th, 2025`: We release our paper on [Arxiv](https://arxiv.org/abs/2502.xxxxx).
+*   `Dec. 10th, 2025`: We release the **InfiniteVL** model weights and inference code! Please check [Model Zoo](#model-zoo).
+*   `Dec. 10th, 2025`: We release our paper on [Arxiv](https://arxiv.org/abs/2512.08829).
 
 ## Getting Started
 
