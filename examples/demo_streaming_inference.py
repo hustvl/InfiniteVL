@@ -31,25 +31,13 @@ import torch
 from PIL import Image
 from transformers import AutoModelForCausalLM, AutoProcessor
 
-# Import specific modeling components for InfiniteVL
-# Ensure these files are in your python path or current directory
-try:
-    from modeling_qwen2_5_vl import (
-        StaticCachePrealloc,
-        StaticSlidingWindowLayerPrealloc,
-        StaticLinearLayerPrealloc,
-    )
-except ImportError:
-    print("Error: modeling_qwen2_5_vl.py not found. Please ensure the model code is accessible.")
-    sys.exit(1)
-
 # ================= Configuration & Constants =================
 
 # Default queries for demonstration: (Frame Index, Question)
 DEFAULT_QUERIES = [
     (150, "Describe what is happening in the current scene."),
-    (300, "What objects are moving in the video?"),
-    (450, "Summarize the events from the beginning of the video."),
+    (300, "Describe what is happening in the current scene."),
+    (450, "Describe what is happening in the current scene."),
 ]
 
 IMG_TOKENS_PER_FRAME = 256  # InfiniteVL specific: tokens per visual frame
