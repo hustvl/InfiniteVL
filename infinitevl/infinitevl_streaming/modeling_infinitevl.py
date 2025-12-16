@@ -48,7 +48,7 @@ from transformers.utils import (
 from transformers.utils.deprecation import deprecate_kwarg
 from transformers.models.qwen2.modeling_qwen2 import Qwen2RMSNorm as InfiniteVLRMSNorm
 
-from configuration_infinitevl import InfiniteVLConfig, InfiniteVLTextConfig, InfiniteVLVisionConfig
+from .configuration_infinitevl import InfiniteVLConfig, InfiniteVLTextConfig, InfiniteVLVisionConfig
 
 from fla.layers.utils import get_unpad_data, index_first_axis, pad_input
 from fla.modules import FusedRMSNormGated, RMSNorm, ShortConvolution
