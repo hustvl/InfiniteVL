@@ -1,0 +1,53 @@
+### model
+model_name_or_path: Qwen/Qwen2.5-VL-3B-Instruct #Qwen2.5-VL-3B-Instruct
+image_max_pixels: 1806336
+video_max_pixels: 16384
+trust_remote_code: true
+
+### method
+stage: sft                   
+do_train: true
+finetuning_type: customize   
+
+### dataset
+dataset: mllm_demo
+template: qwen2_vl
+cutoff_len: 8096
+max_samples: 5000
+preprocessing_num_workers: 16
+
+### output
+output_dir: ./output/qwen2.5vl_distill
+logging_steps: 10
+save_steps: 5000
+plot_loss: true
+overwrite_output_dir: true
+tokenized_path: saves/1000_VLM_SFT_test
+
+### train
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 8
+learning_rate: 2.0e-4
+num_train_epochs: 1.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.01
+bf16: true
+ddp_timeout: 180000000
+
+### distillation config
+mixer: GatedDeltaNet
+mse_factor: 1000
+distill_temperature: 2    
+linear_mode: convert         
+
+checkpoint_path:  #choose the checkpoint from distill stage2
+mixer_config:
+  use_D: false
+  use_qknorm: false
+  use_short_conv: true
+  use_gnorm: true
+  use_A: true
+  mimic_init: true
+
+distill_weights: ["g_proj", "in_proj", "conv", "D", "g_norm", "q_proj", "k_proj", "v_proj"]
+softmax_attention: [0, 4, 8, 12, 16, 20, 24, 28, 32]       

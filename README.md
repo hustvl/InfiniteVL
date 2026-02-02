@@ -2,12 +2,17 @@
 
 <img src="assets/Logo.png" width="500" alt="InfiniteVL Logo">
 
+<h3>
+    🎉 All Training & Model Code is Open-Source! <br>
+    Welcome to use and feedback. Please Star 🌟</a> to support us!
+</h3>
+
 <hr>
 
 ### InfiniteVL: Synergizing Linear and Sparse Attention for Highly-Efficient, Unlimited-Input Vision-Language Models
 
 
-Hongyuan Tao<sup>1</sup>,
+[Hongyuan Tao](https://github.com/Hongyuan-Tao)<sup>1</sup>,
 [Bencheng Liao](https://github.com/LegendBC)<sup>1</sup>,
 [Shaoyu Chen](https://scholar.google.com/citations?user=PIeNN2gAAAAJ&hl=en&oi=sra)<sup>2</sup>,
 Haoran Yin<sup>2</sup>,
@@ -24,7 +29,7 @@ Haoran Yin<sup>2</sup>,
 
 
 <br>
-<a href="https://arxiv.org/abs/2502.xxxxx"><img src="https://img.shields.io/badge/arXiv-Paper-b31b1b.svg" alt="arXiv"></a>
+<a href="https://arxiv.org/abs/2512.08829"><img src="https://img.shields.io/badge/arXiv-Paper-b31b1b.svg" alt="arXiv"></a>
 <a href="https://huggingface.co/hustvl/InfiniteVL/"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Models-blue" alt="Hugging Face"></a>
 
 </div>
@@ -47,8 +52,9 @@ By synergizing **Sliding Window Attention (SWA)** for fine-grained local percept
 *   🏆 **Strong Performance:** Matches leading Transformer-based VLMs (e.g., Qwen2.5-VL-3B) and significantly outperforms previous linear VLMs (e.g., VL-Mamba, Cobra) on comprehensive aspects.
 
 ## News
-*   `Dec. 9th, 2025`: We release the **InfiniteVL** model weights and inference code! Please check [Model Zoo](#model-zoo).
-*   `Dec. 9th, 2025`: We release our paper on [Arxiv](https://arxiv.org/abs/2502.xxxxx).
+* `Feb. 2nd, 2026`: 🚀 We have released the **full training code and scripts**! You can now reproduce our results following the [Training Strategy](#training-strategy).
+* `Dec. 10th, 2025`: We release the **InfiniteVL** model weights and inference code! Please check [Model Zoo](#model-zoo).
+* `Dec. 10th, 2025`: We release our paper on [Arxiv](https://arxiv.org/abs/2512.08829).
 
 ## Getting Started
 
@@ -131,6 +137,28 @@ To achieve strong multimodal performance with minimal training resources, Infini
 *   **Method:** **LoRA** fine-tuning with context length extended to **32,768**.
 *   **Outcome:** Produces the **Stage 3 Model**, enabling length extrapolation and stable streaming inference.
 
+### ⚙️ Reproduction Steps
+
+Our training codebase is built upon **[LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory)**. Please refer to their repository for detailed documentation and framework usage.
+
+We provide standard scripts to reproduce our three-stage training pipeline. The training is launched via `train.sh`.
+
+> **Note:** Before running, please modify the `model_name_or_path`, `dataset` and `checkpoint_path` inside the `.yaml` files to point to your local directories.
+
+**1. Distillation Pretraining (layer to layer)**
+```bash
+bash train.sh examples/train_linear/train_config_distill_stage1.yaml
+```
+
+**2. Distillation Pretraining (End to End)**
+```bash
+bash train.sh examples/train_linear/train_config_distill_stage2.yaml
+```
+
+**3. Instruction SFT**
+```bash
+bash train.sh examples/train_linear/train_config_distill_sft.yaml
+```
 
 ## Performance
 
