@@ -247,9 +247,16 @@ def _setup_lora_tuning(
     return model
 
 def _setup_distill_tuning(model, finetuning_args, cast_trainable_params_to_fp32=False):
-    
     for name, param in model.named_parameters():
-        if any(weight_name in name for weight_name in finetuning_args.distill_weights) and not any(f".{num}." in name for num in finetuning_args.softmax_attention):
+        if finetuning_args.stage == "sft":
+            trainable = any(weight_name in name for weight_name in finetuning_args.distill_weights)
+        else:
+            trainable = (
+                any(weight_name in name for weight_name in finetuning_args.distill_weights)
+                and not any(f".{num}." in name for num in finetuning_args.softmax_attention)
+            )
+
+        if trainable:
             param.requires_grad_(True) 
             if cast_trainable_params_to_fp32:
                 param.data = param.data.to(torch.float32)

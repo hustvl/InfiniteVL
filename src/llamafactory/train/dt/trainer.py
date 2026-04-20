@@ -19,7 +19,6 @@ import json
 import os
 from types import MethodType
 from typing import TYPE_CHECKING, Any, Optional, Union
-from collections import defaultdict
 
 import numpy as np
 import torch
@@ -49,33 +48,52 @@ logger = logging.get_logger(__name__)
 class TeacherInputCapture:
     def __init__(self, teacher_model):
         self.teacher_model = teacher_model
-        self.inputs_dict = defaultdict(list)
+        self.inputs_dict = {}
+        self.outputs_dict = {}
         self._register_hooks()
+
+    def _clone_tensor_tree(self, value):
+        if value is None:
+            return None
+        if isinstance(value, torch.Tensor):
+            return value.detach().clone().contiguous()
+        if isinstance(value, tuple):
+            return tuple(self._clone_tensor_tree(item) for item in value)
+        if isinstance(value, list):
+            return [self._clone_tensor_tree(item) for item in value]
+        return value
 
     def _create_layer_hook(self, layer_idx):
         def hook(module, args, kwargs):
             hook_inputs = {
-                'hidden_states': args[0].detach().clone().contiguous(),
-                'attention_mask': (kwargs.get('attention_mask').detach().clone().contiguous() 
-                   if kwargs.get('attention_mask') is not None else None),
-                'position_ids': (kwargs.get('position_ids').detach().clone().contiguous() 
-                   if kwargs.get('position_ids') is not None else None),
+                'hidden_states': self._clone_tensor_tree(args[0]),
+                'attention_mask': self._clone_tensor_tree(kwargs.get('attention_mask')),
+                'position_ids': self._clone_tensor_tree(kwargs.get('position_ids')),
                 'past_key_value': None,
                 'use_cache': False,   #'output_attentions': kwargs.get('output_attentions'),
-                'cache_position': kwargs.get('cache_position').detach().clone().contiguous(),
-                'position_embeddings': kwargs.get('position_embeddings'),
+                'cache_position': self._clone_tensor_tree(kwargs.get('cache_position')),
+                'position_embeddings': self._clone_tensor_tree(kwargs.get('position_embeddings')),
             }
 
             self.inputs_dict[layer_idx] = hook_inputs
         
         return hook
 
+    def _create_layer_output_hook(self, layer_idx):
+        def hook(module, args, kwargs, output):
+            layer_output = output if isinstance(output, torch.Tensor) else output[0]
+            self.outputs_dict[layer_idx] = self._clone_tensor_tree(layer_output)
+
+        return hook
+
     def _register_hooks(self):
         for idx, layer in enumerate(self.teacher_model.base_model.language_model.layers):  # 注意模型实际路径
             layer.register_forward_pre_hook(self._create_layer_hook(idx), with_kwargs=True)
+            layer.register_forward_hook(self._create_layer_output_hook(idx), with_kwargs=True)
     
     def clear(self):
         self.inputs_dict.clear()
+        self.outputs_dict.clear()
 
 
 class LayerDistillationTrainer(Seq2SeqTrainer):
@@ -117,10 +135,12 @@ class LayerDistillationTrainer(Seq2SeqTrainer):
 
     @override
     def compute_loss(self, model, inputs, *args, **kwargs):
+        self.teacher_capture.clear()
         with torch.no_grad():
-            teacher_outputs = self.teacher_model(**inputs, output_hidden_states=True)
+            self.teacher_model(**inputs, output_hidden_states=False)
         
         for idx, layer in enumerate(model.module.base_model.language_model.layers):
+            teacher_layer_target = self.teacher_capture.outputs_dict[idx]
             
             x = layer(
                 self.teacher_capture.inputs_dict[idx]["hidden_states"],
@@ -131,7 +151,7 @@ class LayerDistillationTrainer(Seq2SeqTrainer):
                 position_embeddings = self.teacher_capture.inputs_dict[idx]["position_embeddings"]
             )[0]
             
-            layer_loss = F.mse_loss(x, teacher_outputs.hidden_states[idx+1])
+            layer_loss = F.mse_loss(x, teacher_layer_target)
             
             if idx == 0:
                 total_loss = layer_loss
