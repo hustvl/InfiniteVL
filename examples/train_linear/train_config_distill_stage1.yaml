@@ -49,5 +49,5 @@ mixer_config:
   use_A: true
   mimic_init: true
 
-distill_weights: ["g_proj", "in_proj", "conv", "D", "g_norm", "q_proj", "k_proj", "v_proj"]
+distill_weights: ["q_proj", "k_proj", "v_proj", "q_conv1d", "k_conv1d", "v_conv1d", "g_proj", "a_proj", "b_proj", "A_log", "dt_bias", "o_norm", "o_proj"]
 softmax_attention: [0, 4, 8, 12, 16, 20, 24, 28, 32]        
