@@ -36,20 +36,19 @@ Haoran Yin<sup>2</sup>,
 
 ## Introduction
 
-**InfiniteVL** is a novel linear-complexity Vision-Language Model (VLM) architecture designed to overcome the computational bottlenecks of traditional Transformers in processing **unlimited multimodal streams**.
+**InfiniteVL** is an efficient Vision-Language Model that combines **linear attention** for compact long-term memory with **sparse attention** for precise visual perception. It achieves Transformer-level multimodal performance while supporting highly efficient long-context processing.
 
+Based on InfiniteVL, we develop two specialized variants:
 
-By synergizing **Sliding Window Attention (SWA)** for fine-grained local perception and **Gated DeltaNet** for efficient long-term memory, InfiniteVL achieves a "best of both worlds" balance. It delivers competitive performance on standard benchmarks (comparable to Qwen2.5-VL) while enabling constant-memory inference and high-throughput streaming.
-
-<div align="center">
-<img src="assets/image1_new_01.png" width="800" alt="InfiniteVL Logo">
-</div>
+- **Sparse InfiniteVL** for offline long-video understanding, using dynamic sparse retrieval to preserve fine-grained visual information.
+- **Streaming InfiniteVL** for continuous scene perception, enabling real-time streaming with bounded memory usage.
 
 ### ✨ Key Highlights
-*   🚀 **High Efficiency:** Achieves **>3.6×** inference speedup and constant memory footprint compared to FlashAttention-2 accelerated Transformers.
-*   ⚡ **Real-Time Streaming:** Sustains a stable **24 FPS** prefill speed on a single **NVIDIA RTX 4090** for continuous video understanding.
-*   🧠 **Unlimited Context:** Effectively retains context over extremely long sequences (tested >500K tokens) without OOM errors.
-*   🏆 **Strong Performance:** Matches leading Transformer-based VLMs (e.g., Qwen2.5-VL-3B) and significantly outperforms previous linear VLMs (e.g., VL-Mamba, Cobra) on comprehensive aspects.
+
+- 🚀 **Efficient Foundation:** InfiniteVL achieves Transformer-level multimodal performance with a **1.7× decoding speedup**.
+- 🔎 **Sparse Long-Context Retrieval:** Sparse InfiniteVL achieves a **5× prefill speedup at 256K context**.
+- ⚡ **Real-Time Streaming:** Streaming InfiniteVL sustains **25 FPS** with a constant **O(1) memory footprint**.
+- 🧠 **Precise and Long-Range:** Sparse attention preserves critical visual details, while linear attention efficiently maintains long-term context.
 
 ## News
 * `Feb. 2nd, 2026`: 🚀 We have released the **full training code and scripts**! You can now reproduce our results following the [Training Strategy](#training-strategy).
@@ -81,8 +80,7 @@ pip install -r requirements.txt
 
 *   [Introduction](#introduction)
 *   [Getting started](#getting-started)
-*   [Architecture](#architecture)
-*   [Training Strategy](#training-strategy)
+*   [Architecture & Training](#architecture--training)
 *   [Performance & Main Results](#performance)
 *   [Model Zoo](#model-zoo) 
 *   [Advanced Usage (Streaming)](#advanced-usage-cuda-graph-acceleration)
@@ -90,52 +88,24 @@ pip install -r requirements.txt
 *   [Citation](#citation)
 *   [Acknowledgement](#acknowledgement)
 
-## Architecture
+## Architecture & Training
 
 <div align="center">
-  <!-- 请确保将论文中的 Figure 2 截图保存为 assets/architecture.png -->
-  <img src="assets/architecture.png" alt="InfiniteVL Architecture" width="50%">
+  <img src="assets/architecture.png" width="100%" alt="InfiniteVL Architecture and Training Pipeline">
 </div>
 <br>
 
-**InfiniteVL** adopts a hybrid architecture that synergizes the efficiency of linear attention with the precision of window-based attention. The model comprises a **Vision Encoder** (adapted from Qwen2.5-VL), a **Projection MLP**, and a **Decoder-only LLM Backbone**.
+InfiniteVL combines **sparse attention** for precise visual perception with **linear attention** for efficient long-term memory. Based on this architecture, we develop two variants for different long-context scenarios:
 
-### Key Design Highlights
+- **Sparse InfiniteVL** targets offline long-video understanding with dynamic sparse retrieval.
+- **Streaming InfiniteVL** targets continuous scene perception with efficient bounded-memory streaming.
 
-*   **Hybrid Block Design**: The LLM backbone consists of **9 Hybrid Blocks**. Within each block, we strategically interleave:
-    *   **1 Sliding Window Attention (SWA) Layer**: Responsible for capturing high-resolution local context and fine-grained visual details.
-    *   **3 Gated DeltaNet Layers**: Responsible for modeling long-range global dependencies with linear complexity.
+Our training follows a three-stage progressive knowledge-transfer pipeline:
 
-*   **Constant Memory Footprint**: Unlike traditional Transformers where the Key-Value (KV) cache grows linearly with sequence length ($O(N)$), the **Gated DeltaNet** layers compress history into a fixed-size memory state (e.g., $16 \times 128 \times 256$). This enables **constant memory usage** and constant inference latency, even when processing unlimited input streams.
+1. **Architectural Alignment:** Transfer knowledge from a Transformer VLM to InfiniteVL through layer-wise and logit distillation.
+2. **Capability Recovery:** Restore strong general multimodal capabilities with continuous supervised fine-tuning.
+3. **Long-Sequence Adaptation:** Specialize InfiniteVL into Sparse InfiniteVL and Streaming InfiniteVL for offline and online long-context understanding.
 
-*   **Seamless Integration**: By combining SWA and Gated DeltaNet, InfiniteVL achieves the "best of both worlds":
-    *   Local attention ensures high performance on information-intensive tasks (e.g., OCR, Document Understanding).
-    *   Linear attention ensures efficiency and stability for long-context scenarios (e.g., Streaming Video Understanding).
-
-## Training Strategy
-
-To achieve strong multimodal performance with minimal training resources, InfiniteVL employs a **three-stage progressive training strategy**. This approach allows our linear-complexity model to inherit the vast knowledge of a Transformer teacher before adapting to long-context scenarios.
-
-<div align="center">
-  <img src="assets/training_strategy.png" alt="Training Pipeline" width="90%">
-</div>
-
-### Stage 1: Distillation Pretraining (Efficient Initialization)
-*   **Goal:** Rapidly transfer knowledge from the **Qwen2.5-VL** teacher to the InfiniteVL student.
-*   **Method:** We replace the teacher's attention layers with **Gated DeltaNet** while keeping other parameters frozen. We use **Layer-wise MSE Loss** (to align internal states) and **End-to-End KL Divergence** (to align output logits).
-*   **Significance:** This bypasses the difficulty of training linear attention from scratch, ensuring a robust initialization.
-
-### Stage 2: Instruction SFT (General Capabilities)
-*   **Goal:** Unlock strong instruction-following and reasoning capabilities.
-*   **Data:** **~8M** diverse multimodal instruction pairs, covering General VQA, OCR, Mathematics, and Code.
-*   **Settings:** Image resolution increased to **1344×1344**; max context length set to 8,192.
-*   **Outcome:** Produces the **Stage 2 Model**, which offers the best performance on standard benchmarks.
-
-### Stage 3: Long-Sequence SFT (Context Extension)
-*   **Goal:** Activate the architecture's potential for **unlimited-length processing** and streaming.
-*   **Data:** A mixture of Stage 2 data (800K) and **~200K long-sequence samples** (e.g., long videos, multi-page documents).
-*   **Method:** **LoRA** fine-tuning with context length extended to **32,768**.
-*   **Outcome:** Produces the **Stage 3 Model**, enabling length extrapolation and stable streaming inference.
 
 ### ⚙️ Reproduction Steps
 
