@@ -91,7 +91,7 @@ pip install -r requirements.txt
 ## Architecture & Training
 
 <div align="center">
-  <img src="assets/architecture.png" width="100%" alt="InfiniteVL Architecture and Training Pipeline">
+  <img src="assets/architecture1.png" width="100%" alt="InfiniteVL Architecture and Training Pipeline">
 </div>
 <br>
 
