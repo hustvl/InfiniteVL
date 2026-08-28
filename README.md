@@ -32,6 +32,10 @@ Haoran Yin<sup>2</sup>,
 <a href="https://arxiv.org/abs/2512.08829"><img src="https://img.shields.io/badge/arXiv-Paper-b31b1b.svg" alt="arXiv"></a>
 <a href="https://huggingface.co/hustvl/InfiniteVL/"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Models-blue" alt="Hugging Face"></a>
 
+<br>
+<b>🔥 [Aug. 2026] GLM-5.3 & Qwen3.8-next both adopt <u>linear + sparse attention</u> as their core architecture.<br>
+InfiniteVL is one of the first fully open-source implementations of this design — with paper, training code, and checkpoints.</b>
+
 </div>
 
 ## Introduction
@@ -51,6 +55,7 @@ Based on InfiniteVL, we develop two specialized variants:
 - 🧠 **Precise and Long-Range:** Sparse attention preserves critical visual details, while linear attention efficiently maintains long-term context.
 
 ## News
+* `Aug. 28th, 2026`: 🔥 Today's released **GLM-5.3** and **Qwen3.8-next** both adopt **linear + sparse attention** as their core architecture — the design InfiniteVL explored and fully open-sourced (paper + training code + checkpoints) last year. If you want to understand, reproduce, or build on this architecture, this repo is a complete starting point!
 * `Feb. 2nd, 2026`: 🚀 We have released the **full training code and scripts**! You can now reproduce our results following the [Training Strategy](#training-strategy).
 * `Dec. 10th, 2025`: We release the **InfiniteVL** model weights and inference code! Please check [Model Zoo](#model-zoo).
 * `Dec. 10th, 2025`: We release our paper on [Arxiv](https://arxiv.org/abs/2512.08829).
