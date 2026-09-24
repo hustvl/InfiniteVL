@@ -2,10 +2,6 @@
 
 <img src="assets/Logo.png" width="500" alt="InfiniteVL Logo">
 
-<h3>
-    Neurips 2026
-</h3>
-
 <hr>
 
 ### InfiniteVL: Synergizing Linear and Sparse Attention for Highly-Efficient, Unlimited-Input Vision-Language Models
