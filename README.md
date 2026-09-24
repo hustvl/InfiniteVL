@@ -54,6 +54,7 @@ Based on InfiniteVL, we develop two specialized variants:
 - 🧠 **Precise and Long-Range:** Sparse attention preserves critical visual details, while linear attention efficiently maintains long-term context.
 
 ## News
+* `Sep. 25th, 2026`: InfiniteVL has been accepted by NeurIPS 2026! 🎉🎉🎉
 * `Aug. 28th, 2026`: 🔥 Today's released **GLM-5.3** and **Qwen3.8-next** both adopt **linear + sparse attention** as their core architecture — the design InfiniteVL explored and fully open-sourced (paper + training code + checkpoints) last year. If you want to understand, reproduce, or build on this architecture, this repo is a complete starting point!
 * `Feb. 2nd, 2026`: 🚀 We have released the **full training code and scripts**! You can now reproduce our results following the [Training Strategy](#training-strategy).
 * `Dec. 10th, 2025`: We release the **InfiniteVL** model weights and inference code! Please check [Model Zoo](#model-zoo).
