@@ -3,8 +3,7 @@
 <img src="assets/Logo.png" width="500" alt="InfiniteVL Logo">
 
 <h3>
-    🎉 All Training & Model Code is Open-Source! <br>
-    Welcome to use and feedback. Please Star 🌟</a> to support us!
+    Neurips 2026
 </h3>
 
 <hr>
